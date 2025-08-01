@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Input from '../components/Input';
-import PasswordStrengthMeter from '../components/PasswordStrengthMeter';
+import PasswordStrengthMeter from '../components/PasswordStrenthMeter';
 import { User, Mail, Lock, Loader } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
