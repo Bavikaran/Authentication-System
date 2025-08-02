@@ -1,10 +1,18 @@
-
-import React from "react";
-// eslint-disable-next-line no-unused-vars
+import { useNavigate } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars  
 import { motion } from "framer-motion";
 import { BookOpen, User, FileText, LogOut } from "lucide-react";
 
 const FullScreenDashboard = () => {
+  const navigate = useNavigate();  // Initialize useNavigate hook
+
+  const handleLogout = () => {
+    // Optionally, clear any authentication data (e.g., tokens, user info)
+    // localStorage.removeItem('authToken');  // Example: Clear token
+
+    navigate("/login");  // Redirect to login page
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -12,16 +20,18 @@ const FullScreenDashboard = () => {
       transition={{ duration: 0.4 }}
       className="w-full h-screen bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center flex items-center justify-center"
     >
-   <div className="w-full h-full max-h-screen overflow-y-auto bg-white/20 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 p-10 relative">
-      
-       {/* Logout Button */}
-       <div className="absolute top-6 right-6 z-50">
-      <button className="flex items-center gap-3 px-6 py-3 border-2 border--700 text-white text-lg font-bold rounded-full hover:bg-red-100 hover:text-red-700 transition-all duration-200">
-       <LogOut size={24} /> 
-       Log Out
-     </button>
-     </div>
-
+      <div className="w-full h-full max-h-screen overflow-y-auto bg-white/20 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 p-10 relative">
+        
+        {/* Logout Button */}
+        <div className="absolute top-6 right-6 z-50">
+          <button
+            className="flex items-center gap-3 px-6 py-3 border-2 border--700 text-white text-lg font-bold rounded-full hover:bg-red-100 hover:text-red-700 transition-all duration-200"
+            onClick={handleLogout}  // Set the onClick to handleLogout
+          >
+            <LogOut size={24} /> 
+            Log Out
+          </button>
+        </div>
 
         {/* Heading */}
         <h1 className="text-5xl font-bold mb-6 text-center bg-gradient-to-r from-purple-300 to-emerald-500 text-transparent bg-clip-text">
