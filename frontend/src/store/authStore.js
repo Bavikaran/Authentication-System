@@ -88,12 +88,8 @@ resetPassword: async (token, password) => {
 
   try {
     // Make the PUT request to the backend to reset the password
-    const response = await axios.put(
-<<<<<<< HEAD
-      `https://backend-0482.onrender.com/api/auth/reset-password/${token}`,
-=======
-      `https://backend-0482.onrender.com/api/auth/reset-password/${token}`, 
->>>>>>> 2eb9e8ddab33f83b5c5a2ef1de21d1a424b9d454
+    const response = await axios.put(`https://backend-0482.onrender.com/api/auth/reset-password/${token}`,
+
       { password }, // Send the new password in the request body
       { withCredentials: true }
     );
