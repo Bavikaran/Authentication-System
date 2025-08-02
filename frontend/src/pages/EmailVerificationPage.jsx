@@ -47,7 +47,7 @@ const EmailVerificationPage = () => {
       setIsLoading(true);
       setError(null);
       const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-email",
+        "https://backend-0482.onrender.com/api/auth/verify-email",
         { code: verificationCode }
       );
 
