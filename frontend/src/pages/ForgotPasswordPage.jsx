@@ -4,7 +4,8 @@ import { useAuthStore } from '../store/authStore';
 import Input from '../components/Input';
 import { ArrowLeft, Loader, Mail} from "lucide-react";
 import {Link} from "react-router-dom";
-
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
