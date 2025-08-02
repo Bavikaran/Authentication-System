@@ -1,16 +1,16 @@
-// src/pages/ResetPasswordPage.jsx
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import { Lock, Loader } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../store/authStore'; 
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 const ResetPasswordPage = () => {
-  const { token } = useParams(); // get reset token from URL
+  const { token } = useParams(); // Get reset token from URL
   const navigate = useNavigate();
-  const { resetPassword, isLoading, error } = useAuthStore();
+  // eslint-disable-next-line no-unused-vars
+  const { resetPassword, isLoading, error, setError } = useAuthStore(); // Use the error state from the store
 
   const [password, setPassword] = useState('');
   const [success, setSuccess] = useState(false);
@@ -18,9 +18,9 @@ const ResetPasswordPage = () => {
   const handleReset = async (e) => {
     e.preventDefault();
     try {
-      await resetPassword(token, password);
-      setSuccess(true);
-      setTimeout(() => navigate('/login'), 2000);
+      await resetPassword(token, password);  // Call the reset password function from the store
+      setSuccess(true);  // Set success state to true
+      setTimeout(() => navigate('/login'), 2000);  // Redirect to login after 2 seconds
     } catch (err) {
       console.error("Reset failed", err);
     }
@@ -55,7 +55,7 @@ const ResetPasswordPage = () => {
             />
 
             {error && (
-              <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+              <p className="text-red-500 text-sm text-center mt-2">{error}</p>  // Display error if exists
             )}
 
             <motion.button

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const API_URL = "https://backend-0482.onrender.com/api/auth";
+const API_URL = "http://localhost:5000/api/auth";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -40,7 +40,7 @@ forgotPassword: async (email) => {
 
   try {
     const response = await axios.post(
-      "https://backend-0482.onrender.com/api/auth/forgot-password",
+      "http://localhost:5000/api/auth/forgot-password",
       { email },
       { withCredentials: true }
     );
@@ -84,18 +84,32 @@ forgotPassword: async (email) => {
   },
 
 resetPassword: async (token, password) => {
-  set({ isLoading: true, error: null });
+  set({ isLoading: true, error: null });  // Start loading and clear previous errors
+
   try {
-    await axios.put(`https://backend-0482.onrender.com/api/auth/reset-password/${token}`, { password }, { withCredentials: true });
-    set({ isLoading: false });
+    // Make the PUT request to the backend to reset the password
+    const response = await axios.put(
+      `http://localhost:5000/api/auth/reset-password/${token}`, 
+      { password }, // Send the new password in the request body
+      { withCredentials: true }
+    );
+
+    set({ isLoading: false });  // Set loading state to false
+
+    // Optionally handle success (e.g., show a success message in the store)
+    console.log('Password reset successful:', response.data.message);
+
   } catch (err) {
     set({
-      error: err.response?.data?.message || "Password reset failed",
+      error: err.response?.data?.message || "Password reset failed",  // Set the error message
       isLoading: false,
     });
-    throw err;
+
+    console.error('Error during password reset:', err.response?.data || err.message);
+    throw err;  // Optionally re-throw the error if you want to handle it elsewhere
   }
 }
+
 
 
 }));

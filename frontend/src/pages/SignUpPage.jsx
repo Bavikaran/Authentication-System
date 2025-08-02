@@ -13,9 +13,10 @@ const SignUpPage = () => {
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('');
   const [strength, setStrength] = useState(0);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const { signup, error, isLoading } = useAuthStore();
+  const { signup, isLoading } = useAuthStore();
 
   const updateStrength = (newStrength) => {
     setStrength(newStrength);
@@ -27,11 +28,24 @@ const SignUpPage = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+
+    // Basic frontend validation
+    if (!name || !email || !password || !userType) {
+      setError("All fields are required.");
+      return;
+    }
+    if (strength < 3) {
+      setError("Please enter a stronger password.");
+      return;
+    }
+
     try {
-      await signup(email, password, name, userType); // Added userType
+      // Call the signup function from auth store
+      await signup(email, password, name, userType);
       navigate('/verify-email');
     } catch (error) {
       console.log(error);
+      setError(error.response?.data?.message || "Error signing up");
     }
   };
 
@@ -80,9 +94,7 @@ const SignUpPage = () => {
               className="w-full pl-4 pr-3 py-2 bg-gray-100 bg-opacity-50 rounded-lg border border-purple-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 text-black placeholder-gray-500 transition duration-200"
               required
             >
-              <option value="" disabled>
-                Select User Type
-              </option>
+              <option value="" disabled>Select User Type</option>
               <option value="student">Student</option>
               <option value="teacher">Teacher</option>
             </select>
@@ -112,9 +124,7 @@ const SignUpPage = () => {
       <div className="px-8 py-4 bg-gray-300 bg-opacity-50 flex justify-center">
         <p className="text-sm text-gray-900">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Login
-          </Link>
+          <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
         </p>
       </div>
     </motion.div>
