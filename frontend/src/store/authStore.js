@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://backend-0482.onrender.com/api/auth";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -40,7 +40,7 @@ forgotPassword: async (email) => {
 
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/forgot-password",
+      "https://backend-0482.onrender.com/api/auth/forgot-password",
       { email },
       { withCredentials: true }
     );
@@ -86,7 +86,7 @@ forgotPassword: async (email) => {
 resetPassword: async (token, password) => {
   set({ isLoading: true, error: null });
   try {
-    await axios.put(`http://localhost:5000/api/auth/reset-password/${token}`, { password }, { withCredentials: true });
+    await axios.put(`https://backend-0482.onrender.com/api/auth/reset-password/${token}`, { password }, { withCredentials: true });
     set({ isLoading: false });
   } catch (err) {
     set({

@@ -19,9 +19,11 @@ RUN npm run build
 # Nginx stage: Serve the built files with nginx
 FROM nginx:alpine
 
+# Copy custom nginx.conf into the container
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Copy the built React app from the build stage into the nginx container's html directory
 COPY --from=build /app/dist /usr/share/nginx/html
-
 
 # Expose port 80
 EXPOSE 80
