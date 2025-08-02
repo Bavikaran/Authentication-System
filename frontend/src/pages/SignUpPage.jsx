@@ -45,7 +45,7 @@ const SignUpPage = () => {
       navigate('/verify-email');
     } catch (error) {
       console.log(error);
-      setError(error.response?.data?.message || "Error signing up");
+      setError(error.response?.data?.message || "user already exists");
     }
   };
 

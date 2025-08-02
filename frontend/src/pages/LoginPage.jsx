@@ -4,55 +4,69 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, Loader } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../store/authStore'; // Assuming you are using Zustand
+// eslint-disable-next-line no-unused-vars
 import axios from 'axios';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(null); // Error message state
-  const [isResendLoading, setIsResendLoading] = useState(false); // Loading state for resend
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [isVerificationLoading, setIsVerificationLoading] = useState(false); // To show verification loading
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
+  const { login, user } = useAuthStore();
 
-  const { login, isLoading } = useAuthStore();
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      await login(email, password);
-      const { user } = useAuthStore.getState(); // Get current user after login
+  try {
+    // Attempt to log the user in
+    await login(email, password);  
 
-      if (!user?.isVerified) {
-        setErrorMessage("Your account is not verified. Please check your email for the verification link.");
-        return; // Don't proceed if the account is not verified
-      }
+    // Now that the login is successful, retrieve the latest user data
+    const currentUser = useAuthStore.getState().user;
 
-      // Redirect based on userType
-      if (user?.userType === 'student') {
-        navigate("/student-dashboard");
-      } else if (user?.userType === 'teacher') {
-        navigate("/teacher-dashboard");
+    // Check if the account is verified
+    if (currentUser?.isVerified) {
+      // Redirect to the appropriate dashboard based on userType
+      if (currentUser?.userType === 'student') {
+        navigate('/student-dashboard');
+      } else if (currentUser?.userType === 'teacher') {
+        navigate('/teacher-dashboard');
       } else {
-        navigate("/"); // fallback
+        navigate('/');
       }
-
-    } catch (err) {
-      console.error("Login error:", err);
-      setErrorMessage(err.response?.data?.message || "Login failed");
+    } else {
+      // If the account is not verified, show an error message
+      setErrorMessage(
+        <>
+          Your account is not verified.{' '}
+          <span
+            style={{ color: 'blue', cursor: 'pointer' }}
+            onClick={handleVerification}
+          >
+            Please verify your email.
+          </span>
+        </>
+      );
     }
-  };
 
-  const handleResendVerification = async () => {
-    setIsResendLoading(true);
-    try {
-      // eslint-disable-next-line no-unused-vars
-      const response = await axios.post('/api/auth/resend-verification', { email });
-      setIsResendLoading(false);
-      setErrorMessage('Verification email sent! Please check your inbox.');
-    } catch (err) {
-      setIsResendLoading(false);
-      setErrorMessage(err.response?.data?.message || 'Failed to resend verification email.');
-    }
+  } catch (err) {
+    console.error("Login error:", err);
+    setErrorMessage(err.response?.data?.message || "Invalid credentials");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+  
+  const handleVerification = () => {
+    // Navigate to the VerifyEmailPage when the user clicks the link
+    navigate('/verify-email');
   };
 
   return (
@@ -106,25 +120,15 @@ const LoginPage = () => {
           </motion.button>
         </form>
 
-        {/* Resend Verification Button */}
+        {/* Sign up Link */}
         <div className='text-center mt-4'>
-          <button
-            onClick={handleResendVerification}
-            className='text-sm text-blue-500 hover:underline'
-            disabled={isResendLoading}
-          >
-            {isResendLoading ? 'Resending...' : 'Resend Verification Email'}
-          </button>
+          <p className='text-sm text-gray-900'>
+            Don't have an account?{' '}
+            <Link to='/signup' className='text-blue-600 hover:underline'>
+              Sign up
+            </Link>
+          </p>
         </div>
-      </div>
-
-      <div className='px-8 py-4 bg-gray-300 bg-opacity-50 flex justify-center'>
-        <p className='text-sm text-gray-900'>
-          Don't have an account?{" "}
-          <Link to='/signup' className='text-blue-600 hover:underline'>
-            Sign up
-          </Link>
-        </p>
       </div>
     </motion.div>
   );
