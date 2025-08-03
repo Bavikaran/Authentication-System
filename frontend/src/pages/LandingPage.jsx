@@ -17,10 +17,10 @@ const App = () => {
           <div className="text-center md:text-left md:w-1/2">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-purple-900">
               Welcome<br />
-              <span className="text-purple-500">to edu-Hub</span>
+              <span className="text-purple-500">to Edu-Hub</span>
             </h1>
             <p className=" mt-4 text-lg md:text-xl text-ash-600">
-              At edu-Hub, we believe in empowering everyone to learn and grow. Our platform connects students with world-class courses taught by experienced instructors across diverse fields.
+              At Edu-Hub, we believe in empowering everyone to learn and grow. Our platform connects students with world-class courses taught by experienced instructors across diverse fields.
             </p>
             <div className="mt-8 flex justify-center md:justify-start gap-4">
               {/* Login Button - Now a Link to navigate to login page */}

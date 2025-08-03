@@ -69,11 +69,21 @@ export const useAuthStore = create((set) => ({
       { withCredentials: true }
     );
 
+    // Check if the user is verified
+    if (!response.data.user.isVerified) {
+      set({
+        error: `Your account is not verified. Please check your inbox for the verification email.`,
+      });
+      return;
+    }
+
     set({
       user: response.data.user,
       isAuthenticated: true,
       isLoading: false,
     });
+
+    return response.data;
   } catch (error) {
     set({
       error: error.response?.data?.message || "Login failed",
@@ -82,6 +92,7 @@ export const useAuthStore = create((set) => ({
     throw error;
   }
 },
+
   // Reset Password Function
   resetPassword: async (token, password) => {
     set({ isLoading: true, error: null });  // Start loading and clear previous errors

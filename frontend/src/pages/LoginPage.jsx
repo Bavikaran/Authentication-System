@@ -5,6 +5,7 @@ import { Mail, Lock, Loader } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import { useAuthStore } from '../store/authStore'; 
+// eslint-disable-next-line no-unused-vars
 import axios from 'axios';
 
 const LoginPage = () => {
@@ -12,72 +13,55 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isVerificationLoading, setIsVerificationLoading] = useState(false); // To show verification loading
   const navigate = useNavigate();
   const { login } = useAuthStore();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    try {
-      // Attempt to log the user in
-      await login(email, password);
+  try {
+    // Attempt to log in the user
+    await login(email, password);
 
-      // Now that the login is successful, retrieve the latest user data
-      const currentUser = useAuthStore.getState().user;
+    // Get the current user after login
+    const currentUser = useAuthStore.getState().user;
 
-      // Check if the account is verified
-      if (currentUser?.isVerified) {
-        // Redirect to the appropriate dashboard based on userType
-        if (currentUser?.userType === 'student') {
-          navigate('/student-dashboard');
-        } else if (currentUser?.userType === 'teacher') {
-          navigate('/teacher-dashboard');
-        } else {
-          navigate('/'); // Redirect to a default dashboard or home
-        }
-      } else {
-        // If the account is not verified, show an error message
-        setErrorMessage(
-          <>
-            Your account is not verified.{' '}
-            <span
-              style={{ color: 'blue', cursor: 'pointer' }}
-              onClick={handleVerification}
-            >
-              Please verify your email.
-            </span>
-          </>
-        );
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-
-      // Check if the error is due to "User not found"
-      if (err.response?.data?.message === "User not found") {
-        setErrorMessage("User does not exist. Please check your email.");
-      } else {
-        setErrorMessage(err.response?.data?.message || "Invalid credentials");
-      }
-    } finally {
-      setIsLoading(false);
+    if (currentUser?.isVerified) {
+      // If verified, navigate to the appropriate dashboard
+      navigate(currentUser?.userType === 'student' ? '/student-dashboard' : '/teacher-dashboard');
+    } else {
+      // If account is not verified, show an error message with verification prompt
+      setErrorMessage(
+        <p>
+          Your account is not verified.{' '}
+          <span
+            style={{ color: 'blue', cursor: 'pointer' }}
+            onClick={() => navigate('/verify-email')} // Navigate to the verification page
+          >
+            Please verify your email.
+          </span>
+        </p>
+      );
     }
-  };
+  } catch (err) {
+    console.error("Login error:", err);
 
-  const handleVerification = async () => {
-    try {
-      setIsVerificationLoading(true);
-      // Trigger the API call to send the verification email
-      await axios.post("https://backend-0482.onrender.com/api/auth/send-verification-email", { email });
-      setErrorMessage("Verification email has been sent. Please check your inbox.");
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
-      setErrorMessage("Failed to resend verification email. Please try again.");
-    } finally {
-      setIsVerificationLoading(false);
+    // Check if the error is related to the user not being found or unverified account
+    if (err.response?.data?.message === "User not found") {
+      setErrorMessage("User does not exist. Please check your email.");
+    } else if (err.response?.data?.message.includes("verification email")) {
+      // If verification is required, show message and navigate to verification page
+      setErrorMessage("Your account is not verified. A verification email has been sent. Please check your inbox.");
+      navigate("/verify-email");
+    } else {
+      setErrorMessage(err.response?.data?.message || "Invalid credentials");
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <motion.div
@@ -91,6 +75,7 @@ const LoginPage = () => {
           Welcome Back
         </h2>
 
+        {/* Displaying the errorMessage with the link */}
         {errorMessage && <p className="text-red-500 text-sm mb-4 text-center">{errorMessage}</p>}
 
         <form onSubmit={handleLogin}>
@@ -139,9 +124,6 @@ const LoginPage = () => {
             </Link>
           </p>
         </div>
-
-        {/* Show loading text when verification email is being sent */}
-        {isVerificationLoading && <p className="text-center text-sm text-blue-500">Sending verification email...</p>}
       </div>
     </motion.div>
   );
