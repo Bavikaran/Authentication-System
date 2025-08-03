@@ -5,73 +5,79 @@ import { Mail, Lock, Loader } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import { useAuthStore } from '../store/authStore'; 
-
-// eslint-disable-next-line no-unused-vars
 import axios from 'axios';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [isVerificationLoading, setIsVerificationLoading] = useState(false); // To show verification loading
   const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
-  const { login, user } = useAuthStore();
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
+  const { login } = useAuthStore();
 
-  try {
-    // Attempt to log the user in
-    await login(email, password);  
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-    // Now that the login is successful, retrieve the latest user data
-    const currentUser = useAuthStore.getState().user;
+    try {
+      // Attempt to log the user in
+      await login(email, password);
 
-    // Check if the account is verified
-    if (currentUser?.isVerified) {
-      // Redirect to the appropriate dashboard based on userType
-      if (currentUser?.userType === 'student') {
-        navigate('/student-dashboard');
-      } else if (currentUser?.userType === 'teacher') {
-        navigate('/teacher-dashboard');
+      // Now that the login is successful, retrieve the latest user data
+      const currentUser = useAuthStore.getState().user;
+
+      // Check if the account is verified
+      if (currentUser?.isVerified) {
+        // Redirect to the appropriate dashboard based on userType
+        if (currentUser?.userType === 'student') {
+          navigate('/student-dashboard');
+        } else if (currentUser?.userType === 'teacher') {
+          navigate('/teacher-dashboard');
+        } else {
+          navigate('/'); // Redirect to a default dashboard or home
+        }
       } else {
-        navigate('/'); // Redirect to a default dashboard or home
+        // If the account is not verified, show an error message
+        setErrorMessage(
+          <>
+            Your account is not verified.{' '}
+            <span
+              style={{ color: 'blue', cursor: 'pointer' }}
+              onClick={handleVerification}
+            >
+              Please verify your email.
+            </span>
+          </>
+        );
       }
-    } else {
-      // If the account is not verified, show an error message
-      setErrorMessage(
-        <>
-          Your account is not verified.{' '}
-          <span
-            style={{ color: 'blue', cursor: 'pointer' }}
-            onClick={handleVerification}
-          >
-            Please verify your email.
-          </span>
-        </>
-      );
-    }
-  } catch (err) {
-    console.error("Login error:", err);
-    
-    // Check if the error is due to "User not found"
-    if (err.response?.data?.message === "User not found") {
-      setErrorMessage("User does not exist. Please check your email.");
-    } else {
-      setErrorMessage(err.response?.data?.message || "Invalid credentials");
-    }
-  } finally {
-    setIsLoading(false);
-  }
-};
+    } catch (err) {
+      console.error("Login error:", err);
 
-  
-  const handleVerification = () => {
-    // Navigate to the VerifyEmailPage when the user clicks the link
-    navigate('/verify-email');
+      // Check if the error is due to "User not found"
+      if (err.response?.data?.message === "User not found") {
+        setErrorMessage("User does not exist. Please check your email.");
+      } else {
+        setErrorMessage(err.response?.data?.message || "Invalid credentials");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerification = async () => {
+    try {
+      setIsVerificationLoading(true);
+      // Trigger the API call to send the verification email
+      await axios.post("https://backend-0482.onrender.com/api/auth/send-verification-email", { email });
+      setErrorMessage("Verification email has been sent. Please check your inbox.");
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      setErrorMessage("Failed to resend verification email. Please try again.");
+    } finally {
+      setIsVerificationLoading(false);
+    }
   };
 
   return (
@@ -134,6 +140,9 @@ const handleLogin = async (e) => {
             </Link>
           </p>
         </div>
+
+        {/* Show loading text when verification email is being sent */}
+        {isVerificationLoading && <p className="text-center text-sm text-blue-500">Sending verification email...</p>}
       </div>
     </motion.div>
   );

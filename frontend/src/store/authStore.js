@@ -59,30 +59,29 @@ export const useAuthStore = create((set) => ({
   },
 
   // Login Function
-  login: async (email, password) => {
-    set({ isLoading: true, error: null });
+ login: async (email, password) => {
+  set({ isLoading: true, error: null });
 
-    try {
-      const response = await axios.post(
-        `${API_URL}/login`,
-        { email, password },
-        { withCredentials: true }
-      );
+  try {
+    const response = await axios.post(
+      `${API_URL}/login`,
+      { email, password },
+      { withCredentials: true }
+    );
 
-      set({
-        user: response.data.user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } catch (error) {
-      set({
-        error: error.response?.data?.message || "Login failed",
-        isLoading: false,
-      });
-      throw error;
-    }
-  },
-
+    set({
+      user: response.data.user,
+      isAuthenticated: true,
+      isLoading: false,
+    });
+  } catch (error) {
+    set({
+      error: error.response?.data?.message || "Login failed",
+      isLoading: false,
+    });
+    throw error;
+  }
+},
   // Reset Password Function
   resetPassword: async (token, password) => {
     set({ isLoading: true, error: null });  // Start loading and clear previous errors
