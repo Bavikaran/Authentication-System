@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, Loader } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
-import useAuthStore from './store/authStore'; // Assuming you are using Zustand
+import { useAuthStore } from '../store/authStore'; 
+
 // eslint-disable-next-line no-unused-vars
 import axios from 'axios';
 
@@ -18,8 +19,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
   const { login, user } = useAuthStore();
-
- const handleLogin = async (e) => {
+const handleLogin = async (e) => {
   e.preventDefault();
   setIsLoading(true);
 
@@ -38,7 +38,7 @@ const LoginPage = () => {
       } else if (currentUser?.userType === 'teacher') {
         navigate('/teacher-dashboard');
       } else {
-        navigate('/');
+        navigate('/'); // Redirect to a default dashboard or home
       }
     } else {
       // If the account is not verified, show an error message
@@ -54,10 +54,15 @@ const LoginPage = () => {
         </>
       );
     }
-
   } catch (err) {
     console.error("Login error:", err);
-    setErrorMessage(err.response?.data?.message || "Invalid credentials");
+    
+    // Check if the error is due to "User not found"
+    if (err.response?.data?.message === "User not found") {
+      setErrorMessage("User does not exist. Please check your email.");
+    } else {
+      setErrorMessage(err.response?.data?.message || "Invalid credentials");
+    }
   } finally {
     setIsLoading(false);
   }

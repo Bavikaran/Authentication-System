@@ -10,7 +10,7 @@ export const useAuthStore = create((set) => ({
   isLoading: false,
   isCheckingAuth: true,
 
-  //  Signup Function
+  // Signup Function
   signup: async (email, password, name, userType) => {
     set({ isLoading: true, error: null });
 
@@ -34,31 +34,31 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-// Inside your useAuthStore definition
-forgotPassword: async (email) => {
-  set({ isLoading: true, error: null });
 
-  try {
-    const response = await axios.post(
-      "https://backend-0482.onrender.com/api/auth/forgot-password",
-      { email },
-      { withCredentials: true }
-    );
+  // Forgot Password Function
+  forgotPassword: async (email) => {
+    set({ isLoading: true, error: null });
 
-    set({ isLoading: false });
-    console.log("Reset email sent:", response.data.message);
-  } catch (err) {
-    console.error("Forgot password error:", err);
-    set({
-      error: err.response?.data?.message || "Failed to send reset link",
-      isLoading: false,
-    });
-    throw err;
-  }
-},
+    try {
+      const response = await axios.post(
+        `${API_URL}/forgot-password`,
+        { email },
+        { withCredentials: true }
+      );
 
+      set({ isLoading: false });
+      console.log("Reset email sent:", response.data.message);
+    } catch (err) {
+      console.error("Forgot password error:", err);
+      set({
+        error: err.response?.data?.message || "Failed to send reset link",
+        isLoading: false,
+      });
+      throw err;
+    }
+  },
 
-  //  Login Function
+  // Login Function
   login: async (email, password) => {
     set({ isLoading: true, error: null });
 
@@ -83,38 +83,46 @@ forgotPassword: async (email) => {
     }
   },
 
-resetPassword: async (token, password) => {
-  set({ isLoading: true, error: null });  // Start loading and clear previous errors
+  // Reset Password Function
+  resetPassword: async (token, password) => {
+    set({ isLoading: true, error: null });  // Start loading and clear previous errors
 
-  try {
-    // Make the PUT request to the backend to reset the password
-    const response = await axios.put(`https://backend-0482.onrender.com/api/auth/reset-password/${token}`,
+    try {
+      const response = await axios.put(
+        `${API_URL}/reset-password/${token}`,
+        { password },
+        { withCredentials: true }
+      );
 
-      { password }, // Send the new password in the request body
-      { withCredentials: true }
-    );
+      set({ isLoading: false });  // Set loading state to false
+      console.log('Password reset successful:', response.data.message);
+    } catch (err) {
+      set({
+        error: err.response?.data?.message || "Password reset failed",
+        isLoading: false,
+      });
 
-    set({ isLoading: false });  // Set loading state to false
+      console.error('Error during password reset:', err.response?.data || err.message);
+      throw err;  // Optionally re-throw the error if you want to handle it elsewhere
+    }
+  },
 
-    // Optionally handle success (e.g., show a success message in the store)
-    console.log('Password reset successful:', response.data.message);
-
-  } catch (err) {
-    set({
-      error: err.response?.data?.message || "Password reset failed",  // Set the error message
-      isLoading: false,
-    });
-
-    console.error('Error during password reset:', err.response?.data || err.message);
-    throw err;  // Optionally re-throw the error if you want to handle it elsewhere
+  // Check Auth (Optional, for initial loading/checking of user authentication)
+  checkAuth: async () => {
+    set({ isCheckingAuth: true });
+    try {
+      const response = await axios.get(`${API_URL}/check-auth`, { withCredentials: true });
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        isCheckingAuth: false,
+      });
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      set({
+        isAuthenticated: false,
+        isCheckingAuth: false,
+      });
+    }
   }
-}
-
-
-
 }));
-
-
-
-
-

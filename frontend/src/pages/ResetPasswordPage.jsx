@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 import Input from '../components/Input';
 import { Lock, Loader } from 'lucide-react';
 import { useAuthStore } from '../store/authStore'; 
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
 
 const ResetPasswordPage = () => {
   const { token } = useParams(); // Get reset token from URL
