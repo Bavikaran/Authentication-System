@@ -49,11 +49,15 @@ const LoginPage = () => {
 
     // Check if the error is related to the user not being found or unverified account
     if (err.response?.data?.message === "User not found") {
-      setErrorMessage("User does not exist. Please check your email.");
+      setErrorMessage("User does not exist. Please signup.");
     } else if (err.response?.data?.message.includes("verification email")) {
       // If verification is required, show message and navigate to verification page
       setErrorMessage("Your account is not verified. A verification email has been sent. Please check your inbox.");
-      navigate("/verify-email");
+
+  // Use setTimeout to delay navigation and show the message for a while
+  setTimeout(() => {
+    navigate("/verify-email");  // After 3 seconds, navigate to the verification page
+  }, 3000); // 3000 milliseconds = 3 seconds
     } else {
       setErrorMessage(err.response?.data?.message || "Invalid credentials");
     }
